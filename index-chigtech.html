@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CHIG TECH B2B – Wholesale Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f7fb; color: #1e293b; }
+        :root { --primary: #ff6a00; --secondary: #0f2c2e; --border: #e2e8f0; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+        .top-bar { background: var(--secondary); color: white; font-size: 0.8rem; padding: 8px 0; }
+        .top-bar .container { display: flex; justify-content: space-between; flex-wrap: wrap; }
+        .top-bar a { color: #f59e0b; text-decoration: none; margin-left: 20px; cursor: pointer; }
+        .main-header { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .header-flex { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; flex-wrap: wrap; }
+        .logo h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, var(--secondary), var(--primary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo p { font-size: 0.7rem; color: #475569; }
+        .search-container { flex: 1; max-width: 400px; margin: 0 20px; display: flex; }
+        .search-container input { flex: 1; padding: 10px 16px; border: 1px solid var(--border); border-radius: 40px 0 0 40px; }
+        .search-container button { background: var(--primary); border: none; padding: 0 18px; border-radius: 0 40px 40px 0; color: white; cursor: pointer; }
+        .header-icons { display: flex; gap: 15px; }
+        .header-icons a { color: #1e293b; text-decoration: none; font-weight: 500; cursor: pointer; }
+        .cart-badge { background: var(--primary); color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.7rem; margin-left: 5px; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .carousel-section { margin: 30px 0; }
+        .carousel-container { position: relative; overflow: hidden; border-radius: 28px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .carousel-slides { display: flex; transition: transform 0.5s ease; }
+        .carousel-slide { min-width: 100%; position: relative; height: 380px; background-size: cover; background-position: center; }
+        .carousel-slide::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 100%); }
+        .carousel-caption { position: absolute; bottom: 40px; left: 40px; color: white; z-index: 2; }
+        .carousel-caption h3 { font-size: 1.8rem; margin-bottom: 8px; }
+        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; font-size: 1.5rem; padding: 10px 16px; cursor: pointer; border-radius: 50%; z-index: 10; }
+        .carousel-btn:hover { background: var(--primary); }
+        .carousel-prev { left: 15px; }
+        .carousel-next { right: 15px; }
+        .filter-bar { background: white; padding: 20px; border-radius: 20px; margin: 30px 0; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; }
+        .filter-group { flex: 1; min-width: 130px; }
+        .filter-group label { font-weight: 600; font-size: 0.8rem; }
+        .filter-group input, .filter-group select { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 30px; margin-top: 5px; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 8px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+        .btn-secondary { background: var(--secondary); color: white; border: none; padding: 8px 24px; border-radius: 40px; cursor: pointer; }
+        .btn-danger { background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 30px; cursor: pointer; }
+        .section-title { font-size: 1.8rem; font-weight: 800; margin: 40px 0 20px; color: var(--secondary); border-left: 5px solid var(--primary); padding-left: 20px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px; margin-bottom: 40px; }
+        .product-card { background: white; border-radius: 20px; padding: 16px; border: 1px solid var(--border); transition: 0.2s; cursor: pointer; }
+        .product-card:hover { box-shadow: 0 12px 24px rgba(0,0,0,0.08); transform: translateY(-4px); }
+        .product-img { width: 100%; height: 180px; object-fit: cover; border-radius: 16px; background: #f1f5f9; }
+        .product-title { font-weight: 700; margin: 12px 0 6px; }
+        .price { font-weight: 800; color: var(--primary); font-size: 1.2rem; }
+        .moq-badge { background: #e0f2fe; color: #0369a1; font-size: 0.7rem; padding: 2px 8px; border-radius: 30px; display: inline-block; margin: 5px 0; }
+        .stock-status { font-size: 0.8rem; margin: 5px 0; }
+        .in-stock { color: #10b981; }
+        .out-of-stock { color: #dc2626; }
+        .qty-selector { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+        .qty-selector button { background: #e2e8f0; border: none; width: 30px; height: 30px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        .qty-selector input { width: 60px; text-align: center; border: 1px solid var(--border); border-radius: 30px; padding: 6px; }
+        .request-quote-btn { background: var(--secondary); color: white; border: none; width: 100%; padding: 8px; border-radius: 40px; margin-top: 8px; cursor: pointer; }
+        .cart-sidebar { position: fixed; right: -450px; top: 0; width: 420px; height: 100%; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.15); z-index: 1000; transition: 0.3s; display: flex; flex-direction: column; padding: 20px; }
+        .cart-sidebar.open { right: 0; }
+        .cart-items { flex: 1; overflow-y: auto; margin: 15px 0; }
+        .cart-item { display: flex; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+        .cart-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1100; justify-content: center; align-items: center; }
+        .modal-content { background: white; border-radius: 28px; padding: 28px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; }
+        .dashboard-grid { display: grid; grid-template-columns: 250px 1fr; gap: 30px; margin: 30px 0; }
+        .dashboard-sidebar { background: white; border-radius: 20px; padding: 20px; border: 1px solid var(--border); }
+        .dashboard-sidebar a { display: block; padding: 12px; color: #1e293b; text-decoration: none; border-radius: 12px; margin-bottom: 8px; cursor: pointer; }
+        .dashboard-sidebar a:hover, .dashboard-sidebar a.active { background: var(--primary); color: white; }
+        .dashboard-content { background: white; border-radius: 20px; padding: 24px; border: 1px solid var(--border); }
+        .order-card, .product-row { border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+        footer { background: var(--secondary); color: #cbd5e1; padding: 40px 0 20px; margin-top: 60px; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 30px; }
+        .footer-links a { color: #cbd5e1; text-decoration: none; font-size: 0.85rem; transition: 0.2s; cursor: pointer; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer-contact { text-align: center; margin-bottom: 30px; font-size: 0.9rem; line-height: 1.6; }
+        .copyright { text-align: center; border-top: 1px solid #2d4a47; padding-top: 20px; font-size: 0.8rem; }
+        @media (max-width: 768px) {
+            .cart-sidebar { width: 100%; right: -100%; }
+            .carousel-slide { height: 250px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .search-container { margin: 10px 0; order: 3; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container">
+            <span>🇲🇼 CHIG TECH & ICT SOLUTIONS – Your Trusted Partner in IT | One Step Your Problems Solved</span>
+            <div>
+                <a id="navLoginBtn"><i class="fas fa-user"></i> Sign In</a>
+                <a id="navRegisterBtn"><i class="fas fa-user-plus"></i> Join Free</a>
+                <a id="navCartBtn"><i class="fas fa-shopping-cart"></i> Quote Cart <span id="cartCount" class="cart-badge">0</span></a>
+                <a id="navDashboardBtn" style="display:none;"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a id="navLogoutBtn" style="display:none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+    <div class="main-header">
+        <div class="container">
+            <div class="header-flex">
+                <div class="logo">
+                    <h1>CHIG TECH B2B</h1>
+                    <p>Wholesale Marketplace – Minimum Order 1</p>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search products...">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="header-icons">
+                    <a id="adminPanelBtn" style="display:none;"><i class="fas fa-shield-alt"></i> Admin</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHOP VIEW (B2B) -->
+    <div id="shopView" class="view active">
+        <div class="container">
+            <div class="carousel-section">
+                <div class="carousel-container">
+                    <div class="carousel-slides" id="carouselSlides"></div>
+                    <button class="carousel-btn carousel-prev" id="carouselPrev">❮</button>
+                    <button class="carousel-btn carousel-next" id="carouselNext">❯</button>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <div class="filter-group"><label>Category</label><select id="filterCategory"><option value="all">All</option><option value="Phone Accessories">📱 Phone Accessories</option><option value="Stationery">✏️ Stationery</option><option value="IT Services">💻 IT Services</option><option value="Networking">🔌 Networking</option><option value="Printing Support">🖨️ Printing Support</option></select></div>
+                <div class="filter-group"><label>Min Price</label><input type="number" id="minPrice" placeholder="0"></div>
+                <div class="filter-group"><label>Max Price</label><input type="number" id="maxPrice" placeholder="Any"></div>
+                <div><button id="applyFiltersBtn" class="btn-primary">Apply</button></div>
+            </div>
+            <div class="section-title">🛍️ Wholesale Catalog (Min. Order 1)</div>
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+    </div>
+
+    <!-- USER DASHBOARD (Quote History) -->
+    <div id="userDashboardView" class="view">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="dashboard-sidebar">
+                    <a class="dashboard-tab active" data-tab="user-quotes">📋 My Quote Requests</a>
+                    <a class="dashboard-tab" data-tab="user-profile">👤 My Profile</a>
+                </div>
+                <div class="dashboard-content">
+                    <div id="userQuotesTab" class="dashboard-tab-content active"><h3>My Quote Requests</h3><div id="userQuotesList"></div></div>
+                    <div id="userProfileTab" class="dashboard-tab-content"><h3>My Profile</h3><div id="userProfileInfo"></div><button id="editProfileBtn" class="btn-primary">Edit Profile</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD (with image upload) -->
+    <div id="adminDashboardView" class="view">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="dashboard-sidebar">
+                    <a class="admin-tab active" data-tab="admin-products">📦 Manage Products</a>
+                    <a class="admin-tab" data-tab="admin-quotes">📋 Quote Requests</a>
+                    <a class="admin-tab" data-tab="admin-reports">📊 Reports</a>
+                </div>
+                <div class="dashboard-content">
+                    <div id="adminProductsTab" class="admin-tab-content active"><h3>Products</h3><button id="addProductBtn" class="btn-primary" style="margin-bottom:20px;">+ Add New Product</button><div id="adminProductsList"></div></div>
+                    <div id="adminQuotesTab" class="admin-tab-content"><h3>Customer Quote Requests</h3><div id="adminQuotesList"></div></div>
+                    <div id="adminReportsTab" class="admin-tab-content"><h3>Sales Reports (from quotes)</h3><div id="salesReport"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Cart Sidebar -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div style="display:flex; justify-content:space-between;"><h3>Quote Request Cart</h3><button id="closeCartBtn" style="background:none; border:none; font-size:1.5rem;">&times;</button></div>
+        <div id="cartItemsList" class="cart-items"></div>
+        <div id="cartTotal" style="font-size:1.2rem; font-weight:bold; margin:10px 0;">Total: MWK 0</div>
+        <button id="requestQuoteBtn" class="btn-secondary">Submit Quote Request</button>
+        <p class="text-xs text-gray-500 mt-2">Our team will contact you within 24h</p>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <h3>Sign In / Join Free (B2B)</h3>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button id="doLoginBtn" class="btn-secondary" style="width:100%; margin:10px 0;">Sign In</button>
+            <hr>
+            <h4>New? Register</h4>
+            <input type="text" id="regName" placeholder="Company / Full Name">
+            <input type="email" id="regEmail" placeholder="Email">
+            <input type="tel" id="regPhone" placeholder="Phone">
+            <input type="text" id="regAddress" placeholder="Business Address">
+            <input type="password" id="regPassword" placeholder="Password">
+            <button id="doRegisterBtn" class="btn-primary" style="width:100%;">Join Free</button>
+            <button id="closeAuthModal" style="margin-top:15px; background:#e2e8f0; border:none; padding:10px; border-radius:30px;">Close</button>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content" style="max-width:700px;">
+            <h3 id="productModalTitle"></h3>
+            <img id="productModalImg" style="width:100%; max-height:280px; object-fit:contain; border-radius:16px;">
+            <div id="productModalPrice" style="font-size:1.3rem; font-weight:800; color:var(--primary); margin:10px 0;"></div>
+            <p id="productModalDesc"></p>
+            <p><strong>MOQ (info):</strong> <span id="productModalMOQ"></span> units</p>
+            <p><strong>Stock:</strong> <span id="productModalStock"></span> units</p>
+            <div class="qty-selector"><button id="modalQtyDecr">-</button><input type="number" id="modalQty" value="1" min="1"><button id="modalQtyIncr">+</button></div>
+            <button id="productModalAddBtn" class="request-quote-btn">Add to Quote Cart</button>
+            <button id="closeProductModal" style="margin-top:15px; background:#e2e8f0; border:none; padding:10px; border-radius:30px;">Close</button>
+        </div>
+    </div>
+
+    <!-- Product Form Modal (Admin with Image Upload) -->
+    <div id="productFormModal" class="modal">
+        <div class="modal-content">
+            <h3 id="productFormTitle">Add Product</h3>
+            <div class="admin-form">
+                <input type="text" id="prodName" placeholder="Product Name">
+                <select id="prodCategory">
+                    <option>Phone Accessories</option><option>Stationery</option><option>IT Services</option><option>Networking</option><option>Printing Support</option>
+                </select>
+                <input type="number" id="prodPrice" placeholder="Price (MWK)">
+                <input type="number" id="prodMOQ" placeholder="Min Order Quantity (MOQ - informational)">
+                <input type="number" id="prodStock" placeholder="Stock Quantity">
+                <textarea id="prodDesc" rows="3" placeholder="Product Description"></textarea>
+                <label>Product Image:</label>
+                <input type="file" id="prodImageFile" accept="image/*">
+                <div style="margin:10px 0;"><img id="prodImagePreview" style="max-width:100%; max-height:150px; display:none;"></div>
+                <button id="saveProductBtn" class="btn-primary">Save Product</button>
+                <button id="closeProductFormBtn" style="margin-top:10px; background:#e2e8f0; border:none; padding:10px; border-radius:30px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Profile</h3>
+            <input type="text" id="editName" placeholder="Full Name">
+            <input type="email" id="editEmail" placeholder="Email">
+            <input type="tel" id="editPhone" placeholder="Phone">
+            <input type="text" id="editAddress" placeholder="Address">
+            <button id="saveProfileBtn" class="btn-primary">Save Changes</button>
+            <button id="closeEditProfileModal" style="margin-top:10px; background:#e2e8f0; border:none; padding:10px; border-radius:30px;">Cancel</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#" id="downloadAppLink"><i class="fas fa-download"></i> Download App</a>
+                <a href="#" id="browseListingsLink"><i class="fas fa-list"></i> Browse Listings</a>
+                <a href="#" id="howToBuyLink"><i class="fas fa-question-circle"></i> How to Buy</a>
+                <a href="#" id="sellLink"><i class="fas fa-tag"></i> Sell</a>
+                <a href="#" id="getVerifiedLink"><i class="fas fa-check-circle"></i> Get Verified</a>
+                <a href="#" id="sellingGuideLink"><i class="fas fa-book"></i> Selling Guide</a>
+                <a href="#" id="aboutLink"><i class="fas fa-info-circle"></i> About CHIG TECH</a>
+                <a href="#" id="privacyLink"><i class="fas fa-lock"></i> Privacy Statement</a>
+                <a href="#" id="termsLink"><i class="fas fa-file-contract"></i> Terms and Conditions</a>
+                <a href="#" id="contactFooterLink"><i class="fas fa-envelope"></i> Contact</a>
+                <a href="#" id="faqLink"><i class="fas fa-question"></i> FAQ</a>
+            </div>
+            <div class="footer-contact">
+                <p><i class="fas fa-map-marker-alt"></i> Zomba Namalaka, behind St Mary's, Malawi</p>
+                <p><i class="fas fa-phone-alt"></i> +265 881 339 726 | +265 990 068 935</p>
+                <p><i class="fas fa-envelope"></i> info@chigtech.mw | <i class="fab fa-facebook"></i> /chigtech</p>
+            </div>
+            <div class="copyright">© 2026 – Wholesale & IT Solutions for Malawi | CHIG TECH B2B Marketplace</div>
+        </div>
+    </footer>
+
+    <script>
+        // ---------- DATA ----------
+        let products = [];
+        let cart = [];
+        let currentUser = null;
+        let quotes = [];
+        let editingProductId = null;
+        let currentFilters = { category:'all', minPrice:0, maxPrice:Infinity };
+
+        // ---------- DEFAULT PRODUCTS (with MOQ info, min order 1) ----------
+        const defaultProducts = [
+            { id: 1, name: "Power Bank 20000mAh", category: "Phone Accessories", price: 25000, moq: 5, stock: 50, image: "https://picsum.photos/id/0/300/200", desc: "Fast charging, dual USB" },
+            { id: 2, name: "USB-C Fast Charger (65W)", category: "Phone Accessories", price: 15000, moq: 10, stock: 100, image: "https://picsum.photos/id/1/300/200", desc: "GaN technology" },
+            { id: 3, name: "iPhone Lightning Cable (1m)", category: "Phone Accessories", price: 5000, moq: 20, stock: 200, image: "https://picsum.photos/id/2/300/200", desc: "MFi certified" },
+            { id: 4, name: "Shockproof Phone Case", category: "Phone Accessories", price: 8000, moq: 10, stock: 150, image: "https://picsum.photos/id/3/300/200", desc: "Anti-shock" },
+            { id: 5, name: "Tempered Glass Screen Protector", category: "Phone Accessories", price: 3000, moq: 20, stock: 500, image: "https://picsum.photos/id/4/300/200", desc: "9H hardness" },
+            { id: 6, name: "Wireless Earphones (TWS)", category: "Phone Accessories", price: 35000, moq: 5, stock: 40, image: "https://picsum.photos/id/5/300/200", desc: "Bluetooth 5.3" },
+            { id: 7, name: "MicroSD Card 128GB", category: "Phone Accessories", price: 25000, moq: 10, stock: 80, image: "https://picsum.photos/id/6/300/200", desc: "Class 10" },
+            { id: 8, name: "USB Flash Drive 64GB", category: "Phone Accessories", price: 12000, moq: 10, stock: 120, image: "https://picsum.photos/id/7/300/200", desc: "USB 3.0" },
+            { id: 9, name: "Ballpoint Pen (Box of 50)", category: "Stationery", price: 15000, moq: 5, stock: 200, image: "https://picsum.photos/id/10/300/200", desc: "Bic quality" },
+            { id: 10, name: "A4 Copy Paper (5 reams)", category: "Stationery", price: 25000, moq: 10, stock: 100, image: "https://picsum.photos/id/11/300/200", desc: "80gsm" },
+            { id: 11, name: "Wi-Fi Installation", category: "IT Services", price: 50000, moq: 1, stock: 999, image: "https://picsum.photos/id/18/300/200", desc: "Router config, cabling" },
+            { id: 12, name: "Computer Repair (per hour)", category: "IT Services", price: 15000, moq: 1, stock: 999, image: "https://picsum.photos/id/19/300/200", desc: "Hardware/software" },
+            { id: 13, name: "Gigabit Router (Wi-Fi 6)", category: "Networking", price: 85000, moq: 2, stock: 30, image: "https://picsum.photos/id/28/300/200", desc: "High-speed dual-band" },
+            { id: 14, name: "Printer Toner Cartridge (HP)", category: "Printing Support", price: 35000, moq: 5, stock: 60, image: "https://picsum.photos/id/32/300/200", desc: "Compatible with LaserJet" }
+        ];
+
+        function loadProducts() {
+            let stored = localStorage.getItem('chig_b2b_products');
+            if (!stored) {
+                localStorage.setItem('chig_b2b_products', JSON.stringify(defaultProducts));
+                products = [...defaultProducts];
+            } else {
+                products = JSON.parse(stored);
+            }
+        }
+        function saveProducts() { localStorage.setItem('chig_b2b_products', JSON.stringify(products)); }
+        function loadCart() { cart = JSON.parse(localStorage.getItem('chig_b2b_cart') || '[]'); updateCartUI(); }
+        function saveCart() { localStorage.setItem('chig_b2b_cart', JSON.stringify(cart)); updateCartUI(); }
+        function loadQuotes() { quotes = JSON.parse(localStorage.getItem('chig_b2b_quotes') || '[]'); }
+        function saveQuotes() { localStorage.setItem('chig_b2b_quotes', JSON.stringify(quotes)); }
+
+        // ---------- AUTH ----------
+        function loadUsers() {
+            let users = localStorage.getItem('chig_b2b_users');
+            if (!users) {
+                let defaultUsers = [{ id: 1, name: "CHIG TECH Admin", email: "admin@chig.com", phone: "0888123456", address: "Zomba", password: btoa("admin123"), isAdmin: true }];
+                localStorage.setItem('chig_b2b_users', JSON.stringify(defaultUsers));
+                return defaultUsers;
+            }
+            return JSON.parse(users);
+        }
+        function login(email, password) {
+            let users = loadUsers();
+            let user = users.find(u => u.email === email && u.password === btoa(password));
+            if (user) {
+                currentUser = { ...user, password: undefined };
+                sessionStorage.setItem('chig_b2b_user', JSON.stringify(currentUser));
+                return true;
+            }
+            return false;
+        }
+        function logout() { currentUser = null; sessionStorage.removeItem('chig_b2b_user'); location.reload(); }
+        function checkAuth() { let s = sessionStorage.getItem('chig_b2b_user'); if(s) { currentUser = JSON.parse(s); return true; } return false; }
+
+        // ---------- QUOTE CART (min quantity 1, no MOQ enforcement) ----------
+        function addToQuoteCart(product, qty) {
+            let finalQty = Math.max(1, qty);
+            let existing = cart.find(i => i.id === product.id);
+            if (existing) existing.quantity += finalQty;
+            else cart.push({ ...product, quantity: finalQty });
+            saveCart();
+            alert(`${finalQty} x ${product.name} added to quote cart`);
+        }
+        function updateCartQuantity(idx, delta) {
+            if (cart[idx]) {
+                cart[idx].quantity += delta;
+                if (cart[idx].quantity <= 0) cart.splice(idx, 1);
+                saveCart();
+            }
+        }
+        function removeFromCart(idx) { cart.splice(idx, 1); saveCart(); }
+        function getCartTotal() { return cart.reduce((s, i) => s + (i.price * i.quantity), 0); }
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.reduce((s,i)=>s+i.quantity,0);
+            const container = document.getElementById('cartItemsList');
+            if (!container) return;
+            if (cart.length === 0) container.innerHTML = '<p>Quote cart is empty</p>';
+            else {
+                container.innerHTML = cart.map((item, idx) => `
+                    <div class="cart-item">
+                        <img src="${item.image}" onerror="this.src='https://picsum.photos/60/60'">
+                        <div style="flex:1">
+                            <div><strong>${item.name}</strong></div>
+                            <div>MWK ${item.price.toLocaleString()} | MOQ: ${item.moq}</div>
+                            <div>
+                                <button onclick="window.updateCartQty(${idx}, -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button onclick="window.updateCartQty(${idx}, 1)">+</button>
+                                <button onclick="window.removeCartItem(${idx})" style="background:#dc2626; color:white; border:none; border-radius:20px; padding:2px 8px;">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('cartTotal').innerHTML = `Total: MWK ${getCartTotal().toLocaleString()}`;
+        }
+        window.updateCartQty = updateCartQuantity;
+        window.removeCartItem = removeFromCart;
+
+        function submitQuoteRequest() {
+            if (!currentUser) { alert('Please login to request a quote'); document.getElementById('authModal').style.display = 'flex'; return; }
+            if (cart.length === 0) { alert('Cart is empty'); return; }
+            const newQuote = {
+                id: Date.now(),
+                userId: currentUser.id,
+                company: currentUser.name,
+                email: currentUser.email,
+                phone: currentUser.phone,
+                items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, moq: i.moq })),
+                total: getCartTotal(),
+                status: "Pending",
+                date: new Date().toISOString()
+            };
+            quotes.push(newQuote);
+            saveQuotes();
+            cart = [];
+            saveCart();
+            alert(`Quote request #${newQuote.id} sent! We will contact you within 24h.`);
+            document.getElementById('cartSidebar').classList.remove('open');
+        }
+
+        // ---------- RENDER PRODUCTS (min quantity 1) ----------
+        function renderProducts() {
+            let filtered = products.filter(p => {
+                if (currentFilters.category !== 'all' && p.category !== currentFilters.category) return false;
+                if (p.price < currentFilters.minPrice) return false;
+                if (p.price > currentFilters.maxPrice) return false;
+                const keyword = document.getElementById('searchInput').value.toLowerCase();
+                if (keyword && !p.name.toLowerCase().includes(keyword) && !p.category.toLowerCase().includes(keyword)) return false;
+                return true;
+            });
+            const grid = document.getElementById('productsGrid');
+            if (filtered.length === 0) { grid.innerHTML = '<div class="no-results">No products found</div>'; return; }
+            grid.innerHTML = filtered.map(p => `
+                <div class="product-card" onclick="showProductDetail(${p.id})">
+                    <img src="${p.image}" class="product-img" onerror="this.src='https://picsum.photos/300/200'">
+                    <div class="product-title">${p.name}</div>
+                    <div class="price">MWK ${p.price.toLocaleString()}</div>
+                    <div class="moq-badge">MOQ (info): ${p.moq}</div>
+                    <div class="stock-status ${p.stock > 0 ? 'in-stock' : 'out-of-stock'}">${p.stock > 0 ? `✓ In stock (${p.stock})` : '✗ Out of stock'}</div>
+                    <div class="qty-selector">
+                        <button class="qty-decr" data-id="${p.id}">-</button>
+                        <input type="number" id="qty-${p.id}" value="1" min="1" class="qty-input">
+                        <button class="qty-incr" data-id="${p.id}">+</button>
+                    </div>
+                    <button class="request-quote-btn" onclick="event.stopPropagation(); addToQuoteCart(${JSON.stringify(p).replace(/"/g, '&quot;')}, parseInt(document.getElementById('qty-${p.id}').value))">Request Quote</button>
+                </div>
+            `).join('');
+            // attach +/- listeners
+            document.querySelectorAll('.qty-decr').forEach(btn => {
+                btn.onclick = (e) => { e.stopPropagation(); let id = btn.dataset.id; let inp = document.getElementById(`qty-${id}`); let val = parseInt(inp.value); if (val > 1) inp.value = val-1; };
+            });
+            document.querySelectorAll('.qty-incr').forEach(btn => {
+                btn.onclick = (e) => { e.stopPropagation(); let id = btn.dataset.id; let inp = document.getElementById(`qty-${id}`); let val = parseInt(inp.value); inp.value = val+1; };
+            });
+        }
+
+        // ---------- CAROUSEL ----------
+        let carouselIndex = 0, carouselInterval;
+        function updateCarousel() {
+            const featured = products.filter(p => p.stock > 0).slice(0, 5);
+            const container = document.getElementById('carouselSlides');
+            if (!container) return;
+            container.innerHTML = featured.map(p => `
+                <div class="carousel-slide" style="background-image: url('${p.image}');">
+                    <div class="carousel-caption">
+                        <h3>${p.name}</h3>
+                        <p>MWK ${p.price.toLocaleString()} | MOQ ${p.moq}</p>
+                        <button class="btn-primary" onclick="addToQuoteCart(${JSON.stringify(p).replace(/"/g, '&quot;')}, 1)">Request Quote</button>
+                    </div>
+                </div>
+            `).join('');
+            goToCarouselSlide(0);
+        }
+        function goToCarouselSlide(idx) { const slides = document.querySelectorAll('.carousel-slide'); if(slides.length) { if(idx<0) idx=slides.length-1; if(idx>=slides.length) idx=0; carouselIndex=idx; document.getElementById('carouselSlides').style.transform = `translateX(-${carouselIndex*100}%)`; } }
+        function nextCarousel() { goToCarouselSlide(carouselIndex+1); }
+        function prevCarousel() { goToCarouselSlide(carouselIndex-1); }
+        function startCarousel() { if(carouselInterval) clearInterval(carouselInterval); carouselInterval = setInterval(nextCarousel, 5000); }
+
+        // ---------- PRODUCT MODAL ----------
+        let currentProductId = null;
+        window.showProductDetail = function(id) {
+            const p = products.find(p => p.id === id);
+            if (!p) return;
+            currentProductId = id;
+            document.getElementById('productModalTitle').innerText = p.name;
+            document.getElementById('productModalImg').src = p.image;
+            document.getElementById('productModalPrice').innerHTML = `MWK ${p.price.toLocaleString()}`;
+            document.getElementById('productModalDesc').innerText = p.desc;
+            document.getElementById('productModalMOQ').innerText = p.moq;
+            document.getElementById('productModalStock').innerHTML = `${p.stock} units`;
+            document.getElementById('modalQty').value = 1;
+            document.getElementById('productModal').style.display = 'flex';
+        };
+        document.getElementById('modalQtyDecr').onclick = () => { let inp = document.getElementById('modalQty'); let val = parseInt(inp.value); if (val > 1) inp.value = val-1; };
+        document.getElementById('modalQtyIncr').onclick = () => { let inp = document.getElementById('modalQty'); let val = parseInt(inp.value); inp.value = val+1; };
+        document.getElementById('productModalAddBtn').onclick = () => {
+            if (currentProductId) {
+                const p = products.find(p => p.id === currentProductId);
+                const qty = parseInt(document.getElementById('modalQty').value);
+                addToQuoteCart(p, qty);
+                document.getElementById('productModal').style.display = 'none';
+            }
+        };
+        document.getElementById('closeProductModal').onclick = () => document.getElementById('productModal').style.display = 'none';
+
+        // ---------- ADMIN FUNCTIONS ----------
+        function renderAdminProducts() {
+            const container = document.getElementById('adminProductsList');
+            container.innerHTML = products.map(p => `
+                <div class="product-row" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div><img src="${p.image}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"> <strong>${p.name}</strong> - MWK ${p.price} | MOQ: ${p.moq} | Stock: ${p.stock}</div>
+                    <div><button onclick="editProduct(${p.id})" class="btn-primary" style="margin-right:8px;">Edit</button><button onclick="deleteProduct(${p.id})" class="btn-danger">Delete</button></div>
+                </div>
+            `).join('');
+        }
+        window.editProduct = function(id) {
+            const p = products.find(p => p.id === id);
+            editingProductId = id;
+            document.getElementById('productFormTitle').innerText = 'Edit Product';
+            document.getElementById('prodName').value = p.name;
+            document.getElementById('prodCategory').value = p.category;
+            document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodMOQ').value = p.moq;
+            document.getElementById('prodStock').value = p.stock;
+            document.getElementById('prodDesc').value = p.desc;
+            document.getElementById('prodImagePreview').src = p.image;
+            document.getElementById('prodImagePreview').style.display = 'block';
+            document.getElementById('productFormModal').style.display = 'flex';
+        };
+        window.deleteProduct = function(id) {
+            if (confirm('Delete product?')) {
+                products = products.filter(p => p.id !== id);
+                saveProducts();
+                renderAdminProducts();
+                renderProducts();
+                updateCarousel();
+            }
+        };
+        function saveProductWithImage(name, category, price, moq, stock, desc, imageUrl) {
+            if (!name || !price || !stock) { alert('Fill all fields'); return; }
+            if (editingProductId) {
+                const idx = products.findIndex(p => p.id === editingProductId);
+                if (idx !== -1) products[idx] = { ...products[idx], name, category, price, moq: moq || 1, stock, desc, image: imageUrl };
+            } else {
+                products.push({ id: Date.now(), name, category, price, moq: moq || 1, stock, desc, image: imageUrl });
+            }
+            saveProducts();
+            document.getElementById('productFormModal').style.display = 'none';
+            renderAdminProducts();
+            renderProducts();
+            updateCarousel();
+        }
+        document.getElementById('addProductBtn').onclick = () => {
+            editingProductId = null;
+            document.getElementById('productFormTitle').innerText = 'Add New Product';
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodCategory').value = 'Phone Accessories';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodMOQ').value = '1';
+            document.getElementById('prodStock').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodImagePreview').style.display = 'none';
+            document.getElementById('prodImageFile').value = '';
+            document.getElementById('productFormModal').style.display = 'flex';
+        };
+        document.getElementById('prodImageFile').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    document.getElementById('prodImagePreview').src = ev.target.result;
+                    document.getElementById('prodImagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        document.getElementById('saveProductBtn').onclick = () => {
+            const name = document.getElementById('prodName').value.trim();
+            const category = document.getElementById('prodCategory').value;
+            const price = parseInt(document.getElementById('prodPrice').value);
+            const moq = parseInt(document.getElementById('prodMOQ').value) || 1;
+            const stock = parseInt(document.getElementById('prodStock').value);
+            const desc = document.getElementById('prodDesc').value;
+            const fileInput = document.getElementById('prodImageFile');
+            let imageUrl = document.getElementById('prodImagePreview').src;
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { imageUrl = e.target.result; saveProductWithImage(name, category, price, moq, stock, desc, imageUrl); };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                saveProductWithImage(name, category, price, moq, stock, desc, imageUrl);
+            }
+        };
+        document.getElementById('closeProductFormBtn').onclick = () => document.getElementById('productFormModal').style.display = 'none';
+
+        function renderAdminQuotes() {
+            const container = document.getElementById('adminQuotesList');
+            if (quotes.length === 0) container.innerHTML = '<p>No quote requests yet.</p>';
+            else {
+                container.innerHTML = quotes.map(q => `
+                    <div class="order-card">
+                        <p><strong>Quote #${q.id}</strong> | ${new Date(q.date).toLocaleString()} | Status: 
+                            <select onchange="updateQuoteStatus(${q.id}, this.value)">
+                                <option ${q.status==='Pending'?'selected':''}>Pending</option>
+                                <option ${q.status==='Processing'?'selected':''}>Processing</option>
+                                <option ${q.status==='Completed'?'selected':''}>Completed</option>
+                            </select>
+                        </p>
+                        <p>Company: ${q.company} | ${q.email} | ${q.phone}</p>
+                        <p>Total: MWK ${q.total.toLocaleString()}</p>
+                        <ul>${q.items.map(i => `<li>${i.name} x${i.quantity} = MWK ${(i.price*i.quantity).toLocaleString()}</li>`).join('')}</ul>
+                        <button onclick="window.open('https://wa.me/265${q.phone.replace(/\D/g,'')}?text=Your%20quote%20%23${q.id}%20is%20now%20${q.status}', '_blank')" class="btn-primary">WhatsApp Customer</button>
+                    </div>
+                `).join('');
+            }
+        }
+        window.updateQuoteStatus = function(id, status) {
+            const q = quotes.find(q => q.id === id);
+            if (q) { q.status = status; saveQuotes(); renderAdminQuotes(); renderSalesReport(); }
+        };
+        function renderSalesReport() {
+            let totalRevenue = quotes.reduce((sum, q) => sum + q.total, 0);
+            let pending = quotes.filter(q => q.status === 'Pending').length;
+            let completed = quotes.filter(q => q.status === 'Completed').length;
+            document.getElementById('salesReport').innerHTML = `
+                <p><strong>Total Revenue (from quotes):</strong> MWK ${totalRevenue.toLocaleString()}</p>
+                <p><strong>Pending Quotes:</strong> ${pending}</p>
+                <p><strong>Completed Quotes:</strong> ${completed}</p>
+                <p><strong>Total Quote Requests:</strong> ${quotes.length}</p>
+            `;
+        }
+
+        function renderUserQuotes() {
+            const userQuotes = quotes.filter(q => q.email === currentUser.email);
+            const container = document.getElementById('userQuotesList');
+            if (userQuotes.length === 0) container.innerHTML = '<p>No quote requests yet.</p>';
+            else {
+                container.innerHTML = userQuotes.map(q => `
+                    <div class="order-card">
+                        <p><strong>Quote #${q.id}</strong> | ${new Date(q.date).toLocaleString()}</p>
+                        <p>Total: MWK ${q.total.toLocaleString()} | Status: <strong>${q.status}</strong></p>
+                        <ul>${q.items.map(i => `<li>${i.name} x${i.quantity}</li>`).join('')}</ul>
+                    </div>
+                `).join('');
+            }
+        }
+        function renderUserProfile() {
+            document.getElementById('userProfileInfo').innerHTML = `
+                <p><strong>Company:</strong> ${currentUser.name}</p>
+                <p><strong>Email:</strong> ${currentUser.email}</p>
+                <p><strong>Phone:</strong> ${currentUser.phone || 'Not set'}</p>
+                <p><strong>Address:</strong> ${currentUser.address}</p>
+            `;
+        }
+
+        // ---------- UI HELPERS ----------
+        function updateAuthUI() {
+            const isLoggedIn = !!currentUser;
+            document.getElementById('navLoginBtn').style.display = isLoggedIn ? 'none' : 'inline-block';
+            document.getElementById('navRegisterBtn').style.display = isLoggedIn ? 'none' : 'inline-block';
+            document.getElementById('navDashboardBtn').style.display = isLoggedIn ? 'inline-block' : 'none';
+            document.getElementById('navLogoutBtn').style.display = isLoggedIn ? 'inline-block' : 'none';
+            document.getElementById('adminPanelBtn').style.display = (isLoggedIn && currentUser.isAdmin) ? 'inline-block' : 'none';
+            if (isLoggedIn && currentUser.isAdmin) document.getElementById('navDashboardBtn').innerHTML = '<i class="fas fa-tachometer-alt"></i> Admin Dashboard';
+            else if (isLoggedIn) document.getElementById('navDashboardBtn').innerHTML = '<i class="fas fa-tachometer-alt"></i> My Dashboard';
+        }
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if (viewId === 'userDashboardView' && currentUser && !currentUser.isAdmin) { renderUserQuotes(); renderUserProfile(); }
+            if (viewId === 'adminDashboardView' && currentUser && currentUser.isAdmin) { renderAdminProducts(); renderAdminQuotes(); renderSalesReport(); }
+        }
+
+        // ---------- FOOTER LINK HANDLERS (All have responses) ----------
+        document.getElementById('downloadAppLink').onclick = () => alert('📱 Download our CHIG TECH B2B App (coming soon to Google Play and App Store). Stay tuned!');
+        document.getElementById('howToBuyLink').onclick = () => alert('🛒 How to Buy: 1) Browse products, 2) Add to quote cart, 3) Submit quote request, 4) Our team contacts you within 24h.');
+        document.getElementById('sellLink').onclick = () => alert('💼 Sell on CHIG TECH: Contact us at info@chigtech.mw to become a verified vendor.');
+        document.getElementById('getVerifiedLink').onclick = () => alert('✅ Get Verified: Provide your business documents to our team for verification and earn the trust badge.');
+        document.getElementById('sellingGuideLink').onclick = () => alert('📖 Selling Guide: List quality products, respond to quotes quickly, and maintain good stock levels.');
+        document.getElementById('privacyLink').onclick = () => alert('🔒 Privacy Statement: We protect your data. Read full policy on request.');
+        document.getElementById('termsLink').onclick = () => alert('📜 Terms and Conditions: By using this platform you agree to our B2B terms. Contact us for full document.');
+        document.getElementById('aboutLink').onclick = () => alert('🏢 CHIG TECH & ICT SOLUTIONS – Your trusted ICT partner in Zomba, Malawi since 2020. We offer quality IT products, stationery, and services.');
+        document.getElementById('faqLink').onclick = () => alert('❓ FAQ: Q: Minimum order? A: 1 unit. Q: Delivery? A: Free in Zomba. Q: Payment? A: Cash, Airtel, TNM. Q: Returns? A: Contact us within 7 days.');
+        document.getElementById('contactFooterLink').onclick = () => alert('📞 Contact CHIG TECH:\n📍 Zomba Namalaka, behind St Mary\'s\n📞 +265 881 339 726 | +265 990 068 935\n📧 info@chigtech.mw\n🌐 /chigtech');
+        document.getElementById('browseListingsLink').onclick = () => { showView('shopView'); window.scrollTo(0,0); };
+        // Also handle the "Browse Listings" from footer (already done) and any other missing ones
+
+        // ---------- EVENT LISTENERS (Main UI) ----------
+        document.getElementById('searchBtn').onclick = () => renderProducts();
+        document.getElementById('applyFiltersBtn').onclick = () => {
+            currentFilters.category = document.getElementById('filterCategory').value;
+            currentFilters.minPrice = parseInt(document.getElementById('minPrice').value) || 0;
+            currentFilters.maxPrice = parseInt(document.getElementById('maxPrice').value) || Infinity;
+            renderProducts();
+        };
+        document.getElementById('navCartBtn').onclick = () => document.getElementById('cartSidebar').classList.add('open');
+        document.getElementById('closeCartBtn').onclick = () => document.getElementById('cartSidebar').classList.remove('open');
+        document.getElementById('requestQuoteBtn').onclick = submitQuoteRequest;
+        document.getElementById('navLoginBtn').onclick = () => document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('navRegisterBtn').onclick = () => document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('closeAuthModal').onclick = () => document.getElementById('authModal').style.display = 'none';
+        document.getElementById('doLoginBtn').onclick = () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pwd = document.getElementById('loginPassword').value;
+            if (login(email, pwd)) { document.getElementById('authModal').style.display = 'none'; updateAuthUI(); showView('shopView'); renderProducts(); }
+            else alert('Invalid credentials');
+        };
+        document.getElementById('doRegisterBtn').onclick = () => {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const addr = document.getElementById('regAddress').value.trim();
+            const pwd = document.getElementById('regPassword').value;
+            if (!name || !email || !addr) { alert('Fill all fields'); return; }
+            let users = loadUsers();
+            if (users.find(u => u.email === email)) { alert('Email exists'); return; }
+            users.push({ id: Date.now(), name, email, phone, address: addr, password: btoa(pwd), isAdmin: false });
+            localStorage.setItem('chig_b2b_users', JSON.stringify(users));
+            alert('Registration successful! Please login.');
+            document.getElementById('authModal').style.display = 'none';
+        };
+        document.getElementById('navDashboardBtn').onclick = () => {
+            if (!currentUser) { alert('Please login'); document.getElementById('authModal').style.display = 'flex'; return; }
+            if (currentUser.isAdmin) showView('adminDashboardView');
+            else showView('userDashboardView');
+        };
+        document.getElementById('navLogoutBtn').onclick = logout;
+        document.getElementById('adminPanelBtn').onclick = () => { if (currentUser && currentUser.isAdmin) showView('adminDashboardView'); else alert('Admin only'); };
+        document.getElementById('editProfileBtn').onclick = () => {
+            document.getElementById('editName').value = currentUser.name;
+            document.getElementById('editEmail').value = currentUser.email;
+            document.getElementById('editPhone').value = currentUser.phone || '';
+            document.getElementById('editAddress').value = currentUser.address;
+            document.getElementById('editProfileModal').style.display = 'flex';
+        };
+        document.getElementById('saveProfileBtn').onclick = () => {
+            currentUser.name = document.getElementById('editName').value;
+            currentUser.email = document.getElementById('editEmail').value;
+            currentUser.phone = document.getElementById('editPhone').value;
+            currentUser.address = document.getElementById('editAddress').value;
+            let users = loadUsers();
+            let idx = users.findIndex(u => u.id === currentUser.id);
+            if (idx !== -1) users[idx] = { ...users[idx], name: currentUser.name, email: currentUser.email, phone: currentUser.phone, address: currentUser.address };
+            localStorage.setItem('chig_b2b_users', JSON.stringify(users));
+            sessionStorage.setItem('chig_b2b_user', JSON.stringify(currentUser));
+            alert('Profile updated');
+            document.getElementById('editProfileModal').style.display = 'none';
+            if (document.getElementById('userProfileTab').classList.contains('active')) renderUserProfile();
+        };
+        document.getElementById('closeEditProfileModal').onclick = () => document.getElementById('editProfileModal').style.display = 'none';
+        document.getElementById('carouselNext').onclick = () => { nextCarousel(); startCarousel(); };
+        document.getElementById('carouselPrev').onclick = () => { prevCarousel(); startCarousel(); };
+
+        document.querySelectorAll('.dashboard-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.dashboard-tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+                if (tab.getAttribute('data-tab') === 'user-quotes') renderUserQuotes();
+                if (tab.getAttribute('data-tab') === 'user-profile') renderUserProfile();
+            });
+        });
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+                if (tab.getAttribute('data-tab') === 'admin-products') renderAdminProducts();
+                if (tab.getAttribute('data-tab') === 'admin-quotes') renderAdminQuotes();
+                if (tab.getAttribute('data-tab') === 'admin-reports') renderSalesReport();
+            });
+        });
+
+        // ---------- INIT ----------
+        loadProducts();
+        checkAuth();
+        loadCart();
+        loadQuotes();
+        renderProducts();
+        updateCarousel();
+        startCarousel();
+        updateAuthUI();
+    </script>
+</body>
+</html>
